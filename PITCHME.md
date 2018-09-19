@@ -38,12 +38,37 @@ Minder magie in applicaties
 Interactieve [Diagrammen](http://rxmarbles.com/)
 
 
---
+---
 
 ## RxJS in de praktijk
 
 
 ---
+
+### Imports
+
+Vanaf RxJS 5.5 
+
+```
+import { Observable } from "rxjs/Obserable";
+import { combineLatest } from "rxjs/operators";
+```
+
+ipv
+
+```
+import { Observable } from "rxjs";
+import { combineLatest } from "rxjs/add/operators";
+```
++++
+
+### Imports
+
+Vaak eenvoudiger:
+
+```
+import * as rx from "rxjs";
+```
 
 ### Pipe
 
@@ -57,7 +82,10 @@ Interactieve [Diagrammen](http://rxmarbles.com/)
   event$.pipe(filter(e => e.type === "drop"))
 ```
 ipv
+
 ```
   event$.filter(e => e.type === "drop")
 ```
+
++++
 
