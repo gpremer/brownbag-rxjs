@@ -61,14 +61,14 @@ Interactieve [Diagrammen](http://rxmarbles.com/)
 
 Vanaf RxJS 5.5 
 
-```
+```ts
 import { Observable } from "rxjs";
 import { combineLatest } from "rxjs/operators";
 ```
 
 ipv
 
-```
+```ts
 import { Observable } from "rxjs/Observable";
 import { combineLatest } from "rxjs/add/operators";
 ```
@@ -79,7 +79,7 @@ import { combineLatest } from "rxjs/add/operators";
 
 Vaak eenvoudiger:
 
-```
+```ts
 import * as rx from "rxjs";
 
 rx.Observable.from([1, 2, 3]);
@@ -96,12 +96,12 @@ new rx.ReplaySubject<number>(10, 100);
 
 - Angular 6 steunt op RxJS 6
 
-```
+```ts
   event$.pipe(filter(e => e.type === "drop"))
 ```
 ipv
 
-```
+```ts
   event$.filter(e => e.type === "drop")
 ```
 
@@ -109,7 +109,7 @@ ipv
 
 #### Combinatie-operatoren
 
-```
+```ts
     merge(a$, b$);
     combineLatest(a$, b$);
     concat(a$, b$);
@@ -118,7 +118,7 @@ ipv
 
 ipv
 
-```
+```ts
     a$.pipe(merge(b$));
     a$.pipe(combineLatest(b$));
     a$.pipe(concat(b$));
@@ -137,7 +137,7 @@ ipv
 - Repetitief => in basisklasse
 
 
-```
+```ts
 this.bindToLifeCycle(this.zoomClickedSubj).subscribe(zoom => ...);
 ```
 
@@ -145,7 +145,7 @@ this.bindToLifeCycle(this.zoomClickedSubj).subscribe(zoom => ...);
 
 #### `bindToLifeCycle`
 
-```
+```ts
 export abstract class KaartComponentBase implements AfterViewInit, OnInit, OnDestroy {
   private readonly destroyingSubj: rx.Subject<void> = new rx.ReplaySubject<void>(1); // laatkomers
 
@@ -159,3 +159,4 @@ export abstract class KaartComponentBase implements AfterViewInit, OnInit, OnDes
   }
 }
 ```
+
