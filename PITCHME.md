@@ -81,6 +81,9 @@ Vaak eenvoudiger:
 
 ```
 import * as rx from "rxjs";
+
+rx.Observable.from([1, 2, 3]);
+new rx.ReplaySubject<number>(10, 100);
 ```
 
 +++
@@ -122,3 +125,37 @@ ipv
     a$.pipe(zip(b$));
 ```
 
+
+---
+
+### Subcribe
+
+- In eerste instantie expliciete subscribes proberen te vermijden
+
+- Indien gebruikt, steeds unsubscribe!
+
+- Repetitief => in basisklasse
+
+
+```
+this.bindToLifeCycle(this.zoomClickedSubj).subscribe(zoom => ...);
+```
+
++++
+
+#### `bindToLifeCycle`
+
+```
+export abstract class KaartComponentBase implements AfterViewInit, OnInit, OnDestroy {
+  private readonly destroyingSubj: rx.Subject<void> = new rx.ReplaySubject<void>(1); // laatkomers
+
+  ngOnDestroy() {
+    this.destroyingSubj.next();
+    this.destroyingSubj.complete();
+  }
+
+  protected bindToLifeCycle<T>(source: rx.Observable<T>): rx.Observable<T> {
+    return source ? source.pipe(takeUntil(this.destroyingSubj)) : source;
+  }
+}
+```
