@@ -45,25 +45,37 @@ Interactieve [Diagrammen](http://rxmarbles.com/)
 
 ---
 
-### Imports
+### Voorbereiden op Angular 6
+
+- Angular 5.1 steunt op RxJS 5.5
+
+- Angular 6 steunt op RxJS 6
+
+- RxJS 6 heeft compat library 
+
+- Maar subset van RxJS 5.5 is forward compatible
+
++++
+
+#### Imports
 
 Vanaf RxJS 5.5 
 
 ```
-import { Observable } from "rxjs/Obserable";
+import { Observable } from "rxjs";
 import { combineLatest } from "rxjs/operators";
 ```
 
 ipv
 
 ```
-import { Observable } from "rxjs";
+import { Observable } from "rxjs/Observable";
 import { combineLatest } from "rxjs/add/operators";
 ```
 
 +++
 
-### Imports
+#### Imports
 
 Vaak eenvoudiger:
 
@@ -71,7 +83,9 @@ Vaak eenvoudiger:
 import * as rx from "rxjs";
 ```
 
-### Pipe
++++
+
+#### Pipe
 
 - Operatoren via `pipe`
 
@@ -89,4 +103,22 @@ ipv
 ```
 
 +++
+
+#### Combinatie-operatoren
+
+```
+    merge(a$, b$);
+    combineLatest(a$, b$);
+    concat(a$, b$);
+    zip(a$, b$);
+```
+
+ipv
+
+```
+    a$.pipe(merge(b$));
+    a$.pipe(combineLatest(b$));
+    a$.pipe(concat(b$));
+    a$.pipe(zip(b$));
+```
 
