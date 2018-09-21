@@ -181,6 +181,8 @@ this.initialising$.pipe(
 
 #### `initialising$`
 
+- vb van observable die zelf stopt (geen unsubscribe)
+
 ```ts
 export abstract class KaartComponentBase implements AfterViewInit, OnInit, OnDestroy {
   private readonly destroyingSubj: rx.Subject<void> = new rx.ReplaySubject<void>(1);
@@ -200,9 +202,6 @@ export abstract class KaartComponentBase implements AfterViewInit, OnInit, OnDes
     return this.initialisingSubj.pipe(takeUntil(this.destroyingSubj));
   }
 ```
-
-- vb van observable die zelf stopt
-
 
 ---
 
@@ -238,6 +237,7 @@ Gebruik switchMap ipv flatMap
 
 - Unsubscribe van binnenste observable
 
+- Bijv. `httpClient`, `initialising$`
 
 ---
 
@@ -247,28 +247,27 @@ Gebruik switchMap ipv flatMap
 
 #### `distinctUntilChanged`
 
-- Vaak gebruikt om effectieve changes te krijgen
+- Om effectieve changes te krijgen
 
-- Maar werkt op object referentie
+- Maar: werkt op object referentie!
 
 ```ts
 this.aanHetTekenen$.pipe(distinctUntilChanged()); // Ok
-viewInstellingen$.pipe(distinctUntilChanged(), map(vi => vi.zoom)) // Nok
-viewInstellingen$.pipe(
+viewInst$.pipe(distinctUntilChanged(), map(vi => vi.zoom)); // Nok
+
+viewInst$.pipe(
   distinctUntilChanged((vi1, vi2) => vi1.zoom === vi2.zoom), 
-  map(vi => vi.zoom)
-); // Ok
-viewInstellingen$.pipe(
+  map(vi => vi.zoom)); // Ok
+viewInst$.pipe(
   map(vi => vi.zoom),
-  distinctUntilChanged(), 
-); // Not really Ok
+  distinctUntilChanged()); // Not really Ok
 ```
 
 +++
 
-#### hergebruik van observables
+#### Hergebruik van observables
 
-- Zelfde observable meer dan eens gebruikt
+- Zelfde observable meerdere keren in HTML template
 
 - Meerdere subscribes op de bron => extra overhead of zelfs neveneffecten
 
@@ -293,7 +292,8 @@ viewInstellingen$.pipe(
 
 ```ts
 stableReferentielagen$ = 
-  this.modelChanges.lagenOpGroep.get("Voorgrond.Laag").pipe(debounceTime(250));
+  this.modelChanges.lagenOpGroep.get("Voorgrond.Laag")
+    .pipe(debounceTime(250));
 ```
 
 +++
@@ -302,9 +302,7 @@ stableReferentielagen$ =
 
 - Angular gebruikt zone.js
 
-- In Angular zone worden objecten geïnstrumenteerd voor ChangeDetection
-
-- Overbodig met Observables
+- Instrumenteert objecten voor ChangeDetection
 
 - Gebruik `observeOutsideAngular` en `observeOnAngular`
 
@@ -406,5 +404,51 @@ numBusy$: rx.Observable<number> = mergedDataloadEvent$.pipe(
 
 - Om initiële toestand te zetten: `startWith`
 
+
 ---
 
+## Vbn uit ng-kaart
+
++++
+
+### Services parallel bevragen
+
+```ts
+stableReferentielagen$.pipe(
+  switchMap(lgn =>
+    stableInfoServices$.pipe(
+      switchMap(svcs =>
+        geklikteLocatie$.pipe(
+          switchMap(locatie =>
+            rx.from(allSvcCalls(lgn, svcs, locatie)).pipe(
+              mergeAll(5), //
+              scan(srv.merge)
+            )
+          )
+        )
+      )
+    )
+  ),
+  observeOnAngular(this.zone)
+)
+```
+
+### Zelf Observable maken
+
+```ts
+function observableFromOlEvents<A extends ol.events.Event>(olObj: ol.Object, ...eventTypes: string[]): rx.Observable<A> {
+  return rx.Observable.create((subscriber: rx.Subscriber<A>) => {
+    let eventsKeys: ol.EventsKey[];
+    try {
+      eventsKeys = olObj.on(eventTypes, (a: A) => subscriber.next(a)) as ol.EventsKey[];
+    } catch (err) {
+      eventsKeys = [];
+      subscriber.error(err);
+    }
+    return () => {
+      kaartLogger.debug("release events ", eventTypes, eventsKeys);
+      ol.Observable.unByKey(eventsKeys);
+    };
+  });
+}
+```
