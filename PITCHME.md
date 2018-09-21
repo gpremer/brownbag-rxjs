@@ -345,10 +345,10 @@ export function observeOnAngular<T>(zone: ZoneLike) {
   return (source: rx.Observable<T>) =>
     new rx.Observable<T>(observer => {
       return source.subscribe({
-        next(x) {
+        next(x: T) {
           zone.run(() => observer.next(x));
         },
-        error(err) {
+        error(err: any) {
           observer.error(err);
         },
         complete() {
@@ -432,6 +432,8 @@ stableReferentielagen$.pipe(
   observeOnAngular(this.zone)
 )
 ```
+
++++
 
 ### Zelf Observable maken
 
