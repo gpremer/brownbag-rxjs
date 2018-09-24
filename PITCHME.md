@@ -394,7 +394,7 @@ catchError(error => {
 
 - Anti-patern!
 
-- Om state bij te houden: gebruik `scan`
+- Om state bij te houden: gebruik `scan`, `startWith`
 
 ```ts
 numBusy$: rx.Observable<number> = mergedDataloadEvent$.pipe(
@@ -410,8 +410,6 @@ numBusy$: rx.Observable<number> = mergedDataloadEvent$.pipe(
   }, 0)
 );
 ```
-
-- Om initiële toestand te zetten: `startWith`
 
 
 ---
@@ -437,8 +435,7 @@ stableReferentielagen$.pipe(
         )
       )
     )
-  ),
-  observeOnAngular(this.zone)
+  )
 )
 ```
 
