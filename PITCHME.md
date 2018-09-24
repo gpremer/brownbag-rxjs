@@ -23,11 +23,13 @@ Minder magie in applicaties
 
 - Lid van Rx*-familie
 
-- In essentie inversion of control
-
-- Gestructureerde manier voor callbacks
+- Basis: `Observable`, `Subscriber`, `Subscription`, `Subject`
 
 - Gamma aan patronen (multi-casting, timing, transformatie, ...)
+
+- In essentie inversion of control
+
+- Gedsciplineerde manier voor callbacks
 
 - Redeneren op hoger niveau
 
@@ -39,7 +41,7 @@ Minder magie in applicaties
 
 ### RxJS marbles
 
-Interactieve [Diagrammen](http://rxmarbles.com/)
+Interactieve [rxmarbles](http://rxmarbles.com/)
 
 
 ---
@@ -66,15 +68,15 @@ Interactieve [Diagrammen](http://rxmarbles.com/)
 Vanaf RxJS 5.5 
 
 ```ts
-import { Observable } from "rxjs";
-import { combineLatest } from "rxjs/operators";
-```
-
-ipv
-
-```ts
 import { Observable } from "rxjs/Observable";
 import { combineLatest } from "rxjs/add/operators";
+```
+
+wordt
+
+```ts
+import { Observable } from "rxjs";
+import { combineLatest } from "rxjs/operators";
 ```
 
 +++
@@ -97,12 +99,12 @@ new rx.ReplaySubject<number>(10, 100);
 - Operatoren via `pipe`
 
 ```ts
-  event$.pipe(filter(e => e.type === "drop"))
+event$.filter(e => e.type === "drop")
 ```
-ipv
+wordt
 
 ```ts
-  event$.filter(e => e.type === "drop")
+event$.pipe(filter(e => e.type === "drop"))
 ```
 
 +++
@@ -110,19 +112,19 @@ ipv
 #### Combinatie-operatoren
 
 ```ts
-    merge(a$, b$);
-    combineLatest(a$, b$);
-    concat(a$, b$);
-    zip(a$, b$);
+a$.pipe(merge(b$));
+a$.pipe(combineLatest(b$));
+a$.pipe(concat(b$));
+a$.pipe(zip(b$));
 ```
 
-ipv
+wordt
 
 ```ts
-    a$.pipe(merge(b$));
-    a$.pipe(combineLatest(b$));
-    a$.pipe(concat(b$));
-    a$.pipe(zip(b$));
+merge(a$, b$);
+combineLatest(a$, b$);
+concat(a$, b$);
+zip(a$, b$);
 ```
 
 
@@ -130,23 +132,23 @@ ipv
 
 ### Subcribe
 
-- In eerste instantie expliciete subscribes proberen te vermijden
+- Poog expliciete subscribes proberen te vermijden
 
-- anti-pattern: member variabele zetten in subscribe!
+- Anti-pattern: member variabele zetten in subscribe!
 
 - Indien gebruikt, steeds unsubscribe!
 
 - Repetitief => `bindToLifeCycle` in basisklasse
 
+- Niet nodig als observable tijdig zelf stopt
 
 ```ts
-this.bindToLifeCycle(this.zoomClickedSubj).subscribe(zoom => ...);
+this.bindToLifeCycle(this.zoomClicked$).subscribe(zoom => ...);
 ```
-- Niet nodig als observable zelf stopt
 
 +++
 
-#### `bindToLifeCycle`
+#### Implementatie `bindToLifeCycle`
 
 ```ts
 export abstract class KaartComponentBase implements AfterViewInit, OnInit, OnDestroy {
@@ -172,16 +174,17 @@ export abstract class KaartComponentBase implements AfterViewInit, OnInit, OnDes
 - niet mogelijk om `super.ngOnInit()` te vergeten
 
 ```ts
-this.initialising$.pipe(
-  switchMap(() => this.modelChanges$.pipe(...))
-).subscribe(...);
+this.initialising$.subscribe(
+  () => this.kaart.dispatch(prt.VoegUiElementToe(TekenenUiSelector))
+);
+this.destroying$.subscribe(
+  () => this.kaart.dispatch(prt.VerwijderUiElement(TekenenUiSelector))
+);
 ```
 
 +++
 
-#### `initialising$`
-
-- vb van observable die zelf stopt (geen unsubscribe)
+#### Implementatie `initialising$`
 
 ```ts
 export abstract class KaartComponentBase implements AfterViewInit, OnInit, OnDestroy {
@@ -199,7 +202,7 @@ export abstract class KaartComponentBase implements AfterViewInit, OnInit, OnDes
   }
 
   protected get initialising$(): rx.Observable<void> {
-    return this.initialisingSubj.pipe(takeUntil(this.destroyingSubj));
+    return this.initialisingSubj;
   }
 ```
 
@@ -435,7 +438,7 @@ stableReferentielagen$.pipe(
 
 +++
 
-### Zelf Observable maken
+### Custom Observable
 
 ```ts
 function observableFromOlEvents<A extends ol.events.Event>(olObj: ol.Object, ...eventTypes: string[]): rx.Observable<A> {
