@@ -206,7 +206,7 @@ export abstract class KaartComponentBase implements AfterViewInit, OnInit, OnDes
   }
 ```
 
----
++++
 
 ### Alternatief voor `subscribe`
 
@@ -232,6 +232,11 @@ export abstract class KaartComponentBase implements AfterViewInit, OnInit, OnDes
 <div *ngIf="enabled$.pipe(map(e => !e)) | async">Niet ok</div> 
 ```
 
+
+---
+
+### Opletten voor
+
 +++
 
 #### 'switchMap`
@@ -241,10 +246,6 @@ Gebruik [switchMap](http://rxmarbles.com/#switchMap) ipv [flatMap/mergeMap](http
 - Unsubscribe van binnenste observable
 
 - Bijv. `httpClient`, `xxxClicked$`
-
----
-
-### Opletten voor
 
 +++
 
