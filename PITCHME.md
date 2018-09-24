@@ -43,7 +43,7 @@ Minder magie in applicaties
 
 [API](https://rxjs-dev.firebaseapp.com/api)
 
-[Learn RxJS](]https://www.learnrxjs.io/)
+[Learn RxJS](https://www.learnrxjs.io/)
 
 [rxmarbles](http://rxmarbles.com/)
 
