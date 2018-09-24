@@ -175,10 +175,10 @@ export abstract class KaartComponentBase implements AfterViewInit, OnInit, OnDes
 
 ```ts
 this.initialising$.subscribe(
-  () => this.kaart.dispatch(prt.VoegUiElementToe(TekenenUiSelector))
+  () => this.kaart.dispatch(VoegUiElementToe(TekenenUiSelector))
 );
 this.destroying$.subscribe(
-  () => this.kaart.dispatch(prt.VerwijderUiElement(TekenenUiSelector))
+  () => this.kaart.dispatch(VerwijderUiElement(TekenenUiSelector))
 );
 ```
 
@@ -212,12 +212,12 @@ export abstract class KaartComponentBase implements AfterViewInit, OnInit, OnDes
 
 - `async` pipe
 
+- Gebruik met `OnPush` change detection strategie
+
 ```html
 <awv-kaart-achtergrond-tile 
   *ngFor="let laag of (backgroundTiles$ | async)">
 ```
-
-- Gebruik met `OnPush` change detection strategie
 
 +++
 
@@ -225,22 +225,22 @@ export abstract class KaartComponentBase implements AfterViewInit, OnInit, OnDes
 
 - Opletten voor expressies in de `async` pipe!
 
+- `async` kijkt ook naar de referentie van de expressie
+
 ```html
 <div *ngIf="enabled$ | async">Ok</div> 
 <div *ngIf="enabled$.pipe(map(e => !e)) | async">Niet ok</div> 
 ```
 
-- async kijkt ook naar de referentie van de expressie
-
 +++
 
 #### 'switchMap`
 
-Gebruik switchMap ipv flatMap
+Gebruik [switchMap](http://rxmarbles.com/#switchMap) ipv [flatMap/mergeMap](http://rxmarbles.com/#mergeMap)
 
 - Unsubscribe van binnenste observable
 
-- Bijv. `httpClient`, `initialising$`
+- Bijv. `httpClient`, `xxxClicked$`
 
 ---
 
@@ -276,6 +276,8 @@ viewInst$.pipe(
 
 - `share` of `shareReplay`
 
+- Eventueel te vermijden met `let`
+
 ```ts
  this.opties$ = this.modelChanges.uiElementOpties$.pipe(
     filter(o => o.naam === LagenUiSelector),
@@ -309,6 +311,8 @@ stableReferentielagen$ =
 
 - Gebruik `observeOutsideAngular` en `observeOnAngular`
 
+- Met `subscribe`
+
 ```ts
 this.internalMessage$.pipe(
    ofType<VerwijderTekenFeatureMsg>("VerwijderTekenFeature"), //
@@ -318,17 +322,17 @@ this.internalMessage$.pipe(
 
 +++
 
-#### `observeOutsideAngular`
+#### Implementatie `observeOutsideAngular`
 
 ```ts
 export function observeOutsideAngular<T>(zone: ZoneLike) {
   return (source: rx.Observable<T>) =>
     new rx.Observable<T>(observer => {
       return source.subscribe({
-        next(x) {
+        next(x: T) {
           zone.runOutsideAngular(() => observer.next(x));
         },
-        error(err) {
+        error(err: any) {
           observer.error(err);
         },
         complete() {
@@ -341,7 +345,7 @@ export function observeOutsideAngular<T>(zone: ZoneLike) {
 
 +++
 
-#### `observeOnAngular`
+#### Implementatie `observeOnAngular`
 
 ```ts
 export function observeOnAngular<T>(zone: ZoneLike) {
@@ -370,6 +374,8 @@ export function observeOnAngular<T>(zone: ZoneLike) {
 
 - En dus updates in UI (voor UI observable)
 
+- evt ook `retry`, `retryWhen`
+
 ```ts
 catchError(error => {
   kaartLogger.error("Fout bij opvragen weglocatie", error);
@@ -378,7 +384,7 @@ catchError(error => {
 })
 ```
 
-- evt ook `retry`, `retryWhen`
++++
 
 #### `BehaviourSubject`
 
