@@ -244,7 +244,7 @@ export abstract class KaartComponentBase implements AfterViewInit, OnInit, OnDes
 
 #### `switchMap`
 
-Gebruik [switchMap](http://rxmarbles.com/#switchMap) ipv [flatMap/mergeMap](http://rxmarbles.com/#mergeMap)
+- Gebruik [switchMap](http://rxmarbles.com/#switchMap) ipv [flatMap/mergeMap](http://rxmarbles.com/#mergeMap)
 
 - Unsubscribe van binnenste observable
 
