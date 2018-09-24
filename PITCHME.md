@@ -39,10 +39,13 @@ Minder magie in applicaties
 
 +++
 
-### RxJS marbles
+### Resources
 
-Interactieve [rxmarbles](http://rxmarbles.com/)
+[API](https://rxjs-dev.firebaseapp.com/api)
 
+[Learn RxJS](]https://www.learnrxjs.io/)
+
+[rxmarbles](http://rxmarbles.com/)
 
 ---
 
